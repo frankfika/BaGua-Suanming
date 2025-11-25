@@ -1,0 +1,7 @@
+{
+  "name": "Zen Bazi Analysis",
+  "description": "A professional Four Pillars of Destiny (Bazi) analysis tool powered by Gemini AI, offering deep insights into personality, career, and fortune.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
