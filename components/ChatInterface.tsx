@@ -42,7 +42,7 @@ const ChatInterface: React.FC = () => {
             <div className="bg-stone-800 p-3 text-center border-b border-amber-600 shadow-md z-10 shrink-0">
                 <h3 className="text-gold font-serif font-bold tracking-widest text-sm flex items-center justify-center gap-2">
                     <span>◈</span>
-                    大师解惑 (Ask the Master)
+                    大师解惑
                     <span>◈</span>
                 </h3>
             </div>

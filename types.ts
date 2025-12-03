@@ -34,6 +34,7 @@ export interface BaziResult {
   strength: string; // Weak, Strong, Balanced, etc.
   chart: BaziChartData;
   solarTimeAdjusted: string; // The time actually used after adjustment
+  solarTerm: string; // The Solar Term (Jie Qi) referencing the month
   fiveElements: {
     wood: number; // Percentage
     fire: number;

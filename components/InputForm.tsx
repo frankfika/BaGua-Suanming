@@ -88,7 +88,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
                 ...prev,
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude,
-                birthLocation: prev.birthLocation || 'Current GPS Location' 
+                birthLocation: prev.birthLocation || '当前位置 (GPS)' 
             }));
             setLocationStatus('success');
         },
@@ -110,7 +110,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
         const y = parseInt(dateParts.year);
         
         if (!d || !m || !y || d < 1 || d > 31 || m < 1 || m > 12 || y < 1900 || y > 2100) {
-            alert("请输入有效的公历日期 (Please enter a valid date)");
+            alert("请输入有效的公历日期");
             return;
         }
 
@@ -168,9 +168,9 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
              {step === 3 && "落地定方位"}
         </h2>
         <p className="text-stone-500 font-serif text-[10px] sm:text-xs mt-1">
-             {step === 1 && "Name & Gender"}
-             {step === 2 && "Date & Time"}
-             {step === 3 && "Birth Location"}
+             {step === 1 && "姓名与性别"}
+             {step === 2 && "出生日期与时间"}
+             {step === 3 && "出生地点"}
         </p>
       </div>
 
@@ -229,40 +229,40 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
                 {/* Date Section */}
                 <div className="flex flex-col items-center w-full">
                     <label className="block text-stone-600 text-xs font-bold mb-4 uppercase tracking-wider text-center">
-                        公历出生日期 (Date)
+                        公历出生日期
                     </label>
                     <div className="flex items-end gap-2 sm:gap-4 justify-center w-full">
                         <div className="flex flex-col items-center flex-1 max-w-[80px]">
                             <input
                                 type="number"
-                                placeholder="DD"
+                                placeholder="日"
                                 value={dateParts.day}
                                 onChange={(e) => handleDateChange('day', e.target.value)}
                                 className="w-full text-center bg-transparent border-b-2 border-stone-300 text-xl sm:text-2xl font-serif py-2 focus:border-red-seal focus:outline-none placeholder-stone-200 transition-colors"
                             />
-                            <span className="text-[10px] text-stone-400 mt-1">日 (Day)</span>
+                            <span className="text-[10px] text-stone-400 mt-1">日</span>
                         </div>
                         <span className="text-xl sm:text-2xl text-stone-300 pb-3">/</span>
                         <div className="flex flex-col items-center flex-1 max-w-[80px]">
                             <input
                                 type="number"
-                                placeholder="MM"
+                                placeholder="月"
                                 value={dateParts.month}
                                 onChange={(e) => handleDateChange('month', e.target.value)}
                                 className="w-full text-center bg-transparent border-b-2 border-stone-300 text-xl sm:text-2xl font-serif py-2 focus:border-red-seal focus:outline-none placeholder-stone-200 transition-colors"
                             />
-                            <span className="text-[10px] text-stone-400 mt-1">月 (Month)</span>
+                            <span className="text-[10px] text-stone-400 mt-1">月</span>
                         </div>
                          <span className="text-xl sm:text-2xl text-stone-300 pb-3">/</span>
                         <div className="flex flex-col items-center flex-1 max-w-[90px]">
                             <input
                                 type="number"
-                                placeholder="YYYY"
+                                placeholder="年"
                                 value={dateParts.year}
                                 onChange={(e) => handleDateChange('year', e.target.value)}
                                 className="w-full text-center bg-transparent border-b-2 border-stone-300 text-xl sm:text-2xl font-serif py-2 focus:border-red-seal focus:outline-none placeholder-stone-200 transition-colors"
                             />
-                            <span className="text-[10px] text-stone-400 mt-1">年 (Year)</span>
+                            <span className="text-[10px] text-stone-400 mt-1">年</span>
                         </div>
                     </div>
                 </div>
@@ -270,29 +270,29 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
                 {/* Time Section */}
                 <div className="flex flex-col items-center pt-2 w-full">
                     <label className="block text-stone-600 text-xs font-bold mb-4 uppercase tracking-wider text-center">
-                        出生时间 (Time)
+                        出生时间
                     </label>
                     <div className="flex items-end gap-2 sm:gap-4 justify-center w-full">
                         <div className="flex flex-col items-center flex-1 max-w-[90px]">
                             <input
                                 type="number"
-                                placeholder="0-23"
+                                placeholder="时"
                                 value={timeParts.hour}
                                 onChange={(e) => handleTimeChange('hour', e.target.value)}
                                 className="w-full text-center bg-transparent border-b-2 border-stone-300 text-2xl sm:text-3xl font-serif py-2 focus:border-red-seal focus:outline-none placeholder-stone-200 font-bold text-ink transition-colors"
                             />
-                            <span className="text-[10px] text-stone-400 mt-1">时 (Hour)</span>
+                            <span className="text-[10px] text-stone-400 mt-1">时</span>
                         </div>
                         <span className="text-2xl sm:text-3xl text-stone-300 pb-3 font-bold">:</span>
                         <div className="flex flex-col items-center flex-1 max-w-[90px]">
                             <input
                                 type="number"
-                                placeholder="0-59"
+                                placeholder="分"
                                 value={timeParts.minute}
                                 onChange={(e) => handleTimeChange('minute', e.target.value)}
                                 className="w-full text-center bg-transparent border-b-2 border-stone-300 text-2xl sm:text-3xl font-serif py-2 focus:border-red-seal focus:outline-none placeholder-stone-200 font-bold text-ink transition-colors"
                             />
-                            <span className="text-[10px] text-stone-400 mt-1">分 (Minute)</span>
+                            <span className="text-[10px] text-stone-400 mt-1">分</span>
                         </div>
                     </div>
                     <p className="text-[10px] text-stone-500 mt-4 sm:mt-6 text-center font-serif max-w-xs">
@@ -313,7 +313,7 @@ const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
                 </div>
 
                 <div className="space-y-4">
-                    <label className="block text-stone-600 text-xs font-bold uppercase tracking-wider text-center">出生地点 (Birth City)</label>
+                    <label className="block text-stone-600 text-xs font-bold uppercase tracking-wider text-center">出生地点</label>
                     
                     <input
                         type="text"

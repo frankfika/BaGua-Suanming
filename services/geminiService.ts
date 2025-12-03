@@ -9,6 +9,7 @@ const analysisSchema: Schema = {
     dayMasterElement: { type: Type.STRING },
     strength: { type: Type.STRING },
     solarTimeAdjusted: { type: Type.STRING },
+    solarTerm: { type: Type.STRING },
     chart: {
       type: Type.OBJECT,
       properties: {
@@ -158,35 +159,45 @@ export const generateBaziAnalysis = async (input: UserInput): Promise<BaziResult
     ? `${input.birthLocation} (Lat: ${input.latitude}, Long: ${input.longitude})`
     : input.birthLocation;
   
-  // Construct a prompt that requires deep knowledge of Chinese metaphysics
   const prompt = `
     You are a Grandmaster of Traditional Chinese Metaphysics (Bazi and Zi Wei Dou Shu).
+    **LANGUAGE REQUIREMENT**: Output all string content strictly in **Simplified Chinese (简体中文)**.
     
     Target Profile:
     - Name: ${input.name}
     - Gender: ${input.gender}
     - Birth Date (Gregorian): ${input.birthDate}
-    - Birth Time (Clock Time): ${input.birthTime}
+    - Birth Time (Clock Time): ${input.birthTime} (Time Zone: Assume Beijing Time UTC+8 if not specified by location)
     - Location: ${locationString}
 
-    **CORE INSTRUCTIONS:**
-    1. **True Solar Time**: You MUST convert the birth time to True Solar Time based on the location longitude before calculating pillars.
-    2. **Shen Sha (Symbolic Stars)**: You MUST calculate major stars for each pillar (e.g., Nobleman/天乙贵人, Peach Blossom/桃花, Traveling Horse/驿马, General Star/将星, etc.).
-    3. **Deep Analysis**: Do not give generic descriptions. Analyze the *structure* (Ge Ju), the *flow* of Qi, and interactions (Clash/Harm/Combine).
-    4. **Predictions**: In Career/Wealth/Relationship sections, provide specific predictions for the next 3-5 years based on Da Yun (10-Year Luck Cycle) and Liu Nian (Annual Pillar).
-
-    **OUTPUT SECTIONS:**
+    **STRICT CALCULATION RULES (CRITICAL):**
+    1.  **True Solar Time**: 
+        - Convert the input Clock Time to True Solar Time (真太阳时).
+        - Formula: Clock Time + ((Longitude - 120) * 4 minutes) + Equation of Time (EOT).
+        - **IMPORTANT**: If the calculated True Solar Time is 23:00 or later, it counts as the **NEXT DAY** for the Day Pillar calculation (Rat Hour).
     
-    *   **Personality**: Analyze internal character vs. external persona. Mention key strengths/weaknesses based on Ten Gods.
-    *   **Career**: Suggest specific industries (Fire-related, Water-related, etc.) and roles (Leadership vs. Technical). Predict career trajectory for next 3 years.
-    *   **Wealth**: Direct wealth vs. Indirect wealth analysis. When will the wealth luck peak?
-    *   **Relationships**: Spouse star analysis. Predicted timing for marriage or relationship changes. Quality of marriage.
-    *   **Health**: Vulnerable organs based on element weakness/excess.
-    *   **Global Fortune**: A summary of the current Da Yun (10-year cycle) and specific predictions for upcoming years (e.g., "2025 Snake Year: ...").
+    2.  **Solar Terms (Jie Qi)**: 
+        - Use the 24 Solar Terms to determine the Month Pillar boundaries strictly. 
+        - Provide the name of the preceding Solar Term in the 'solarTerm' output field (e.g., "立春后5天").
+    
+    3.  **Day Pillar**: 
+        - Must be accurate to the Gregorian date (adjusted for 23:00+ rule). 
+        - Do not hallucinate. Verify against the standard 60 Jia Zi cycle.
+    
+    4.  **Hour Pillar (Five Rats Chasing Hour / 五鼠遁)**:
+        - Apply this table strictly based on the **Day Stem (日干)**:
+        - Jia/Ji (甲/己) Day -> Start Zi hour with Jia-Zi (甲子).
+        - Yi/Geng (乙/庚) Day -> Start Zi hour with Bing-Zi (丙子).
+        - Bing/Xin (丙/辛) Day -> Start Zi hour with Wu-Zi (戊子).
+        - Ding/Ren (丁/壬) Day -> Start Zi hour with Geng-Zi (庚子).
+        - Wu/Gui (戊/癸) Day -> Start Zi hour with Ren-Zi (壬子).
 
-    **Actionable Advice**: For every section, provide concrete advice (e.g., "Wear Red," "Head North," "Partner with people born in Rat year").
+    **ANALYSIS INSTRUCTIONS:**
+    - **Shen Sha**: Calculate major Symbolic Stars (Nobleman, Peach Blossom, Traveling Horse) in Chinese.
+    - **Predictions**: Provide specific year-by-year predictions for the next 3-5 years.
+    - **Advice**: Provide concrete actions (colors, directions, habits).
 
-    **Language**: Professional Simplified Chinese (简体中文). Tone: Wise, specific, empathetic but direct.
+    Output strictly in JSON format matching the schema.
   `;
 
   try {
@@ -196,29 +207,24 @@ export const generateBaziAnalysis = async (input: UserInput): Promise<BaziResult
       config: {
         responseMimeType: "application/json",
         responseSchema: analysisSchema,
-        temperature: 0.75, // Slightly higher for more creative/interpretive depth
+        temperature: 0.2, // Lower temperature for precision in calculation
       },
     });
 
     const resultText = response.text;
     if (!resultText) {
-      throw new Error("No response generated from AI.");
+      throw new Error("AI 未能生成结果。");
     }
 
     const data = JSON.parse(resultText) as BaziResult;
 
-    // Initialize chat session with deep context
     chatSession = ai.chats.create({
         model: "gemini-2.5-flash",
         config: {
             systemInstruction: `You are a Bazi Grandmaster. You have analyzed this chart: ${JSON.stringify(data)}.
             User: ${input.name}. 
-            
-            Your goal is to answer follow-up questions with *predictive depth*.
-            - If asked about "this year", look at the current year pillar vs day master.
-            - If asked about "love", check the spouse star status.
-            - Always be encouraging but realistic about 'Clashes' or 'Void' stars.
-            `
+            Language: Simplified Chinese (简体中文).
+            Be helpful, specific, and encouraging. Focus on the interplay of the Five Elements.`
         }
     });
 
@@ -231,8 +237,8 @@ export const generateBaziAnalysis = async (input: UserInput): Promise<BaziResult
 
 export const chatWithMaster = async (message: string): Promise<string> => {
     if (!chatSession) {
-        throw new Error("Analysis session not initialized.");
+        throw new Error("会话未初始化。");
     }
     const response = await chatSession.sendMessage({ message });
-    return response.text || "The stars are silent momentarily.";
+    return response.text || "天机暂不可泄露。";
 }

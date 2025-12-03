@@ -4,6 +4,7 @@ import { BaziChartData, Pillar } from '../types';
 interface BaziChartDisplayProps {
   chart: BaziChartData;
   solarTime: string;
+  solarTerm?: string;
 }
 
 const TraditionalPillar: React.FC<{ title: string; pillar: Pillar; isDayMaster?: boolean }> = ({ title, pillar, isDayMaster }) => (
@@ -70,20 +71,27 @@ const TraditionalPillar: React.FC<{ title: string; pillar: Pillar; isDayMaster?:
   </div>
 );
 
-const BaziChartDisplay: React.FC<BaziChartDisplayProps> = ({ chart, solarTime }) => {
+const BaziChartDisplay: React.FC<BaziChartDisplayProps> = ({ chart, solarTime, solarTerm }) => {
   return (
     <div className="w-full relative">
-        {/* Solar Time Badge */}
-        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-stone-800 text-gold px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-serif shadow-md z-10 whitespace-nowrap border border-gold/30">
-            真太阳时: {solarTime}
+        {/* Solar Time & Term Badge */}
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-1 z-10 w-full pointer-events-none">
+             <div className="bg-stone-800 text-gold px-3 py-0.5 rounded-full text-[10px] sm:text-xs font-serif shadow-md whitespace-nowrap border border-gold/30">
+                真太阳时: {solarTime}
+            </div>
+            {solarTerm && (
+                <div className="bg-stone-100/90 text-stone-500 px-2 py-0.5 rounded-sm text-[9px] font-serif border border-stone-200 shadow-sm">
+                    {solarTerm}
+                </div>
+            )}
         </div>
 
         {/* Chart Container - Scrollable on mobile */}
-        <div className="pt-8 sm:pt-12 pb-4 sm:pb-8 px-0 sm:px-4 rounded-lg flex justify-start sm:justify-center gap-3 sm:gap-6 overflow-x-auto scrollbar-hide w-full">
-            <TraditionalPillar title="年柱 (Year)" pillar={chart.year} />
-            <TraditionalPillar title="月柱 (Month)" pillar={chart.month} />
-            <TraditionalPillar title="日柱 (Day)" pillar={chart.day} isDayMaster />
-            <TraditionalPillar title="时柱 (Hour)" pillar={chart.hour} />
+        <div className="pt-10 sm:pt-14 pb-4 sm:pb-8 px-0 sm:px-4 rounded-lg flex justify-start sm:justify-center gap-3 sm:gap-6 overflow-x-auto scrollbar-hide w-full">
+            <TraditionalPillar title="年柱" pillar={chart.year} />
+            <TraditionalPillar title="月柱" pillar={chart.month} />
+            <TraditionalPillar title="日柱" pillar={chart.day} isDayMaster />
+            <TraditionalPillar title="时柱" pillar={chart.hour} />
         </div>
     </div>
   );

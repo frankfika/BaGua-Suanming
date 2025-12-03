@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserInput, BaziResult } from './types';
 import InputForm from './components/InputForm';
 import BaziChartDisplay from './components/BaziChartDisplay';
@@ -12,6 +12,26 @@ const App: React.FC = () => {
   const [result, setResult] = useState<BaziResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Load saved state on startup
+  useEffect(() => {
+    const savedResult = localStorage.getItem('zen_bazi_result');
+    if (savedResult) {
+      try {
+        setResult(JSON.parse(savedResult));
+      } catch (e) {
+        console.error("Failed to load saved state", e);
+        localStorage.removeItem('zen_bazi_result');
+      }
+    }
+  }, []);
+
+  // Persist result whenever it changes
+  useEffect(() => {
+    if (result) {
+      localStorage.setItem('zen_bazi_result', JSON.stringify(result));
+    }
+  }, [result]);
+
   const handleAnalyze = async (data: UserInput) => {
     setLoading(true);
     setError(null);
@@ -20,7 +40,7 @@ const App: React.FC = () => {
       const analysis = await generateBaziAnalysis(data);
       setResult(analysis);
     } catch (e: any) {
-      setError("Failed to generate analysis. Please try again. " + (e.message || ""));
+      setError("排盘失败，请重试。" + (e.message || ""));
     } finally {
       setLoading(false);
     }
@@ -29,6 +49,7 @@ const App: React.FC = () => {
   const reset = () => {
     setResult(null);
     setError(null);
+    localStorage.removeItem('zen_bazi_result');
   };
 
   return (
@@ -56,9 +77,9 @@ const App: React.FC = () => {
              </div>
              <div className="flex flex-col">
                 <h1 className="text-sm sm:text-xl font-display font-bold tracking-[0.15em] sm:tracking-[0.2em] text-stone-200 leading-none">
-                    ZEN BAZI
+                    禅 · 八字
                 </h1>
-                <span className="text-[10px] text-stone-500 uppercase tracking-widest hidden sm:block">Professional Analysis</span>
+                <span className="text-[10px] text-stone-500 uppercase tracking-widest hidden sm:block">专业智能排盘</span>
              </div>
           </div>
           {result && (
@@ -105,11 +126,11 @@ const App: React.FC = () => {
                                     <div>
                                         <h2 className="text-xl sm:text-2xl font-serif text-stone-800 font-bold flex items-center gap-2">
                                             <span className="w-1.5 h-6 bg-red-800 block rounded-sm"></span>
-                                            命盘 (Natal Chart)
+                                            八字命盘
                                         </h2>
                                         <div className="flex items-center gap-2 mt-2">
                                             <span className="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded border border-stone-200">
-                                                日元: {result.dayMasterElement}
+                                                五行: {result.dayMasterElement}
                                             </span>
                                             <span className={`text-xs px-2 py-0.5 rounded border font-bold ${
                                                 result.strength.includes('Strong') || result.strength.includes('强') || result.strength.includes('旺') 
@@ -122,10 +143,14 @@ const App: React.FC = () => {
                                     </div>
                                     <div className="text-right hidden sm:block">
                                         <div className="text-4xl font-serif text-stone-800">{result.dayMaster}</div>
-                                        <div className="text-[10px] text-stone-400 uppercase tracking-widest">Day Master</div>
+                                        <div className="text-[10px] text-stone-400 uppercase tracking-widest">日元 (Day Master)</div>
                                     </div>
                                 </div>
-                                <BaziChartDisplay chart={result.chart} solarTime={result.solarTimeAdjusted} />
+                                <BaziChartDisplay 
+                                    chart={result.chart} 
+                                    solarTime={result.solarTimeAdjusted} 
+                                    solarTerm={result.solarTerm}
+                                />
                              </div>
                          </div>
                     </div>
@@ -139,7 +164,8 @@ const App: React.FC = () => {
                 {/* Bottom Section: Analysis Tabs & Chat */}
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
                     {/* Analysis Report */}
-                    <div className="xl:col-span-8 order-2 xl:order-1">
+                    {/* Changed order: Default natural order is Analysis first. Removed mobile 'order' classes. */}
+                    <div className="xl:col-span-8">
                         <AnalysisTabs 
                             analysis={result.analysis} 
                             luckyElements={result.luckyElements} 
@@ -151,7 +177,8 @@ const App: React.FC = () => {
                     </div>
 
                     {/* Chat Interface */}
-                    <div className="xl:col-span-4 sticky top-4 sm:top-24 order-1 xl:order-2 z-30">
+                    {/* Only sticky on XL screens. Default is normal flow (bottom) on mobile. */}
+                    <div className="xl:col-span-4 xl:sticky xl:top-24 z-30">
                         <ChatInterface />
                     </div>
                 </div>

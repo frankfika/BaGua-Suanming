@@ -19,16 +19,16 @@ interface ElementChartProps {
 
 const ElementChart: React.FC<ElementChartProps> = ({ elements }) => {
   const data: ElementData[] = [
-    { name: 'Wood (木)', value: elements.wood, color: '#4ade80' }, // Green
-    { name: 'Fire (火)', value: elements.fire, color: '#f87171' }, // Red
-    { name: 'Earth (土)', value: elements.earth, color: '#fbbf24' }, // Yellow/Earth
-    { name: 'Metal (金)', value: elements.metal, color: '#94a3b8' }, // Gray/Silver
-    { name: 'Water (水)', value: elements.water, color: '#60a5fa' }, // Blue
+    { name: '木', value: elements.wood, color: '#4ade80' }, // Green
+    { name: '火', value: elements.fire, color: '#f87171' }, // Red
+    { name: '土', value: elements.earth, color: '#fbbf24' }, // Yellow/Earth
+    { name: '金', value: elements.metal, color: '#94a3b8' }, // Gray/Silver
+    { name: '水', value: elements.water, color: '#60a5fa' }, // Blue
   ];
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-stone-200 h-full flex flex-col">
-      <h4 className="text-center font-serif text-lg text-stone-800 mb-4">Five Elements Balance (五行分布)</h4>
+      <h4 className="text-center font-serif text-lg text-stone-800 mb-4">五行能量分布</h4>
       <div className="flex-1 w-full h-[250px] min-h-[200px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -54,7 +54,7 @@ const ElementChart: React.FC<ElementChartProps> = ({ elements }) => {
         </ResponsiveContainer>
       </div>
       <div className="text-center text-xs text-stone-400 mt-2 italic">
-        Values represent approximate strength percentage.
+        数值仅代表五行相对强弱比例
       </div>
     </div>
   );

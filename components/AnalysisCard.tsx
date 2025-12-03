@@ -20,7 +20,7 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ section, icon }) => {
                 section.score >= 60 ? 'bg-amber-100 text-amber-800' :
                 'bg-red-100 text-red-800'
             }`}>
-                Score: {section.score}
+                指数: {section.score}
             </div>
         )}
       </div>
